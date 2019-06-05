@@ -53,17 +53,61 @@ class Sprite:
         return self.screen
 
 
+class ChessBoard(Sprite):
+    def __init__(self, screen, width, height, screen_pos, sprite_filename):
+        self.highlighted = []
+        Sprite.__init__(self, screen, width, height, screen_pos, sprite_filename)
+
+    def render(self):
+        self.blit()
+        for pos in self.highlighted:
+            rank = pos[0]
+            file = pos[1]
+            pygame.draw.rect(self.screen, (255,0,0), (65 * (ord(rank) - 97) + 28, 65 * (8-file) + 28, 65, 65), 3)
+
+    def rank_file_from_pos(self, position):
+        rank = chr(((position[0] - 28) // 65) + 97)
+        file = -((position[1] - 28) // 65) + 8
+        if rank in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] and file > 0 and file < 9:
+            return rank, file
+        else:
+            return None
+
+    def clear_highlights(self):
+        self.highlighted = []
+
+    def set_highlighted(self, rank, file):
+        self.highlighted.append((rank, file))
+
+    def get_highlighted(self):
+        return self.highlighted
+
+
 class ChessPiece(Sprite):
 
     def __init__(self, screen, color, type, rank, file):
-        self.rank = rank
+        self.rank = rank.lower()
         self.file = file
-        self.color = color
-        self.type = type
+        self.color = color.lower()
+        self.type = type.lower().capitalize()
         width = 50
         height = 50
-        rank = rank.lower()
         screen_pos = (65 * (ord(rank) - 97) + 28 + 7, 65 * (8-file) + 28 + 5)
-        sprite_filename = color + type + '.png'
+        sprite_filename = self.color + self.type + '.png'
         Sprite.__init__(self, screen, width, height, screen_pos, sprite_filename)
+        self.type = type.lower()
 
+    def __repr__(self):
+        return f'{self.color} {self.type} at {self.rank}{self.file}'
+
+    def get_type(self):
+        return self.type
+
+    def get_color(self):
+        return self.color
+
+    def get_rank(self):
+        return self.rank
+
+    def get_file(self):
+        return self.file

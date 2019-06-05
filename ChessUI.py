@@ -1,60 +1,46 @@
 import pygame
 from Sprite import Sprite
-from Sprite import ChessPiece
+from Sprite import ChessBoard
+from ChessDataModel import ChessDataModel
+import AlgebraicNotationParser
+from ChessMove import ChessMove
+import itertools
+
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+NUMBERS = range(0, 8)
+
+def refresh_screen():
+    screen.fill((0, 0, 0))
+    chessboard.render()
+    for piece in datamodel.get_pieces():
+        piece.blit()
+    pygame.display.flip()
+
 
 pygame.init()
 screen = pygame.display.set_mode((577, 577))
 
-chessboard = Sprite(screen, 577, 577, (0, 0), 'chessboard.jpg')
-chessboard.blit()
-pieces = [ChessPiece(screen, 'white', 'Pawn', 'a', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'b', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'c', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'd', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'e', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'f', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'g', 2),
-          ChessPiece(screen, 'white', 'Pawn', 'h', 2),
-          ChessPiece(screen, 'white', 'Rook', 'a', 1),
-          ChessPiece(screen, 'white', 'Rook', 'h', 1),
-          ChessPiece(screen, 'white', 'Knight', 'b', 1),
-          ChessPiece(screen, 'white', 'Knight', 'g', 1),
-          ChessPiece(screen, 'white', 'Bishop', 'c', 1),
-          ChessPiece(screen, 'white', 'Bishop', 'f', 1),
-          ChessPiece(screen, 'white', 'Queen', 'd', 1),
-          ChessPiece(screen, 'white', 'King', 'e', 1),
-          ChessPiece(screen, 'black', 'Pawn', 'a', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'b', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'c', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'd', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'e', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'f', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'g', 7),
-          ChessPiece(screen, 'black', 'Pawn', 'h', 7),
-          ChessPiece(screen, 'black', 'Rook', 'a', 8),
-          ChessPiece(screen, 'black', 'Rook', 'h', 8),
-          ChessPiece(screen, 'black', 'Knight', 'b', 8),
-          ChessPiece(screen, 'black', 'Knight', 'g', 8),
-          ChessPiece(screen, 'black', 'Bishop', 'c', 8),
-          ChessPiece(screen, 'black', 'Bishop', 'f', 8),
-          ChessPiece(screen, 'black', 'Queen', 'd', 8),
-          ChessPiece(screen, 'black', 'King', 'e', 8),
-          ]
+chessboard = ChessBoard(screen, 577, 577, (0, 0), 'chessboard.jpg')
+datamodel = ChessDataModel(screen)
 
-for piece in pieces:
-    piece.blit()
-
-# pygame.draw.rect(screen, (255,0,0), (28, 28, 520, 520), 1)
-pygame.display.flip()
+turn = 'white'
 
 while True:
     events = pygame.event.get()
+    pos = pygame.mouse.get_pos()
     if len(events) > 0:
-        # print(events)
         for event in events:
             # X BUTTON
             if event.type == pygame.QUIT:
                 exit()
             # LEFT CLICK
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                pass
+                rank, file = chessboard.rank_file_from_pos(pos)
+                if datamodel.piece_at(rank, file):
+                    for spot in list(itertools.product(LETTERS, NUMBERS)):
+                        move = ChessMove(datamodel.piece_at(rank, file), rank, file)
+                        if AlgebraicNotationParser.is_valid_move(move, datamodel):
+                            print(spot)
+                            chessboard.set_highlighted(spot[0], spot[1])
+                print(rank, file)
+    refresh_screen()
