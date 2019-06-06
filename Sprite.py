@@ -60,6 +60,8 @@ class ChessBoard(Sprite):
 
     def render(self):
         self.blit()
+
+    def render_highlights(self):
         for pos in self.highlighted:
             rank = pos[0]
             file = pos[1]
@@ -92,13 +94,16 @@ class ChessPiece(Sprite):
         self.type = type.lower().capitalize()
         width = 50
         height = 50
-        screen_pos = (65 * (ord(rank) - 97) + 28 + 7, 65 * (8-file) + 28 + 5)
+        screen_pos = (65 * (ord(self.rank) - 97) + 28 + 7, 65 * (8-self.file) + 28 + 5)
         sprite_filename = self.color + self.type + '.png'
         Sprite.__init__(self, screen, width, height, screen_pos, sprite_filename)
         self.type = type.lower()
 
     def __repr__(self):
         return f'{self.color} {self.type} at {self.rank}{self.file}'
+
+    def __eq__(self, other):
+        return self.rank == other.rank and self.file == other.file and self.color == other.color and self.type == other.type
 
     def get_type(self):
         return self.type
@@ -111,3 +116,9 @@ class ChessPiece(Sprite):
 
     def get_file(self):
         return self.file
+
+    def set_position(self, rank, file):
+        self.rank = rank
+        self.file = file
+        screen_pos = (65 * (ord(self.rank) - 97) + 28 + 7, 65 * (8 - self.file) + 28 + 5)
+        self.set_screen_pos(screen_pos)

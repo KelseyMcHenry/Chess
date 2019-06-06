@@ -62,3 +62,8 @@ class ChessDataModel:
         return_pieces.sort(key=lambda x: ord(x.get_rank()))
         return return_pieces
 
+    def get_piece(self, target_piece):
+        for piece in self.pieces:
+            if piece == target_piece:
+                return piece
+
