@@ -62,8 +62,60 @@ class ChessDataModel:
         return_pieces.sort(key=lambda x: ord(x.get_rank()))
         return return_pieces
 
+    def pieces_in_diagonal(self, rank, file, left_right):
+        return_pieces = []
+        for piece in self.pieces:
+            if left_right == "left":
+                if piece.get_file() - file == -1 * (ord(piece.get_rank()) - ord(rank)):
+                    return_pieces.append(piece)
+            if left_right == "right":
+                if piece.get_file() - file == ord(piece.get_rank()) - ord(rank):
+                    return_pieces.append(piece)
+        return_pieces.sort(key=lambda x: ord(x.get_rank()))
+        return return_pieces
+
     def get_piece(self, target_piece):
         for piece in self.pieces:
             if piece == target_piece:
                 return piece
+
+    def ray_cast(self, piece, direction):
+        origin = piece.get_rank(), piece.get_file()
+        ray_cast_pieces = []
+        if direction == "N":
+            pieces_in_rank = self.pieces_in_rank(origin[0])
+            ray_cast_pieces = [p for p in pieces_in_rank if p.get_file() > piece.get_file()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file())
+        elif direction == "S":
+            pieces_in_rank = self.pieces_in_rank(origin[0])
+            ray_cast_pieces = [p for p in pieces_in_rank if p.get_file() < piece.get_file()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file(), reverse=True)
+        elif direction == "E":
+            pieces_in_file = self.pieces_in_file(origin[1])
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_rank() > piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: ord(x.get_rank()))
+        elif direction == "W":
+            pieces_in_file = self.pieces_in_file(origin[1])
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_rank() < piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: ord(x.get_rank()), reverse=True)
+        elif direction == "NW":
+            pieces_in_file = self.pieces_in_diagonal(origin[0], origin[1], "left")
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_file() > piece.get_file() and p.get_rank() < piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file())
+        elif direction == "NE":
+            pieces_in_file = self.pieces_in_diagonal(origin[0], origin[1], "right")
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_file() > piece.get_file() and p.get_rank() > piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file())
+        elif direction == "SW":
+            pieces_in_file = self.pieces_in_diagonal(origin[0], origin[1], "right")
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_file() < piece.get_file() and p.get_rank() < piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file(), reverse=True)
+        elif direction == "SE":
+            pieces_in_file = self.pieces_in_diagonal(origin[0], origin[1], "left")
+            ray_cast_pieces = [p for p in pieces_in_file if p.get_file() < piece.get_file() and p.get_rank() > piece.get_rank()]
+            ray_cast_pieces.sort(key=lambda x: x.get_file(), reverse=True)
+        if ray_cast_pieces:
+            return ray_cast_pieces[0]
+        else:
+            return None
 

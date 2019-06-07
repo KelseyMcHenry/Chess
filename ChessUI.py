@@ -47,7 +47,6 @@ while True:
                         if AlgebraicNotationParser.is_valid_move(move, datamodel):
                             chessboard.set_highlighted(spot[0], spot[1])
                     selected = datamodel.piece_at(rank, file)
-                    print(selected)
                 if selected and not datamodel.piece_at(rank, file):
                     move = ChessMove(selected, rank, file)
                     chessboard.clear_highlights()
