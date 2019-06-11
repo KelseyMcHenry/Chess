@@ -1,6 +1,5 @@
 from ChessMove import ChessMove
-from Sprite import ChessPiece
-
+import itertools
 
 def is_valid_move(move, data_model):
     if move.piece.get_type() == "pawn":
@@ -68,7 +67,7 @@ def is_valid_move(move, data_model):
                 northern_limit = northern_limit_piece.get_file()
         if southern_limit_piece:
             if southern_limit_piece.get_color() != move.piece.get_color():
-                southern_limit = southern_limit_piece.get_file - 1
+                southern_limit = southern_limit_piece.get_file() - 1
             else:
                 southern_limit = southern_limit_piece.get_file()
         if western_limit_piece:
@@ -110,7 +109,6 @@ def is_valid_move(move, data_model):
                 sw_limit = chr(ord(sw_limit_piece.get_rank()) - 1), sw_limit_piece.get_file() - 1
             else:
                 sw_limit = sw_limit_piece.get_rank(), sw_limit_piece.get_file()
-        print(nw_limit, ne_limit, se_limit, sw_limit)
         pos = (move.get_rank(), move.get_file())
         if move.get_file() - move.piece.get_file() == -1 * (ord(move.get_rank()) - ord(move.piece.get_rank())):
             if (pos[0] > nw_limit[0] and pos[1] < nw_limit[1]) and (pos[0] < se_limit[0] and pos[1] > se_limit[1]):
@@ -136,7 +134,7 @@ def is_valid_move(move, data_model):
                 northern_limit = northern_limit_piece.get_file()
         if southern_limit_piece:
             if southern_limit_piece.get_color() != move.piece.get_color():
-                southern_limit = southern_limit_piece.get_file - 1
+                southern_limit = southern_limit_piece.get_file() - 1
             else:
                 southern_limit = southern_limit_piece.get_file()
         if western_limit_piece:
@@ -169,7 +167,6 @@ def is_valid_move(move, data_model):
                 sw_limit = chr(ord(sw_limit_piece.get_rank()) - 1), sw_limit_piece.get_file() - 1
             else:
                 sw_limit = sw_limit_piece.get_rank(), sw_limit_piece.get_file()
-        print(nw_limit, ne_limit, se_limit, sw_limit)
         pos = (move.get_rank(), move.get_file())
         if move.get_file() - move.piece.get_file() == -1 * (ord(move.get_rank()) - ord(move.piece.get_rank())):
             if (pos[0] > nw_limit[0] and pos[1] < nw_limit[1]) and (pos[0] < se_limit[0] and pos[1] > se_limit[1]):
@@ -182,10 +179,12 @@ def is_valid_move(move, data_model):
             if move.get_file() < northern_limit and move.get_file() > southern_limit and move.get_rank() < eastern_limit and move.get_rank() > western_limit:
                 return True
     elif move.piece.get_type() == "king":
+        if data_model.king_in_check(move.get_rank(), move.get_file(), move.piece.get_color()):
+            return False
         if abs(move.get_file() - move.piece.get_file()) <= 1 and abs(ord(move.get_rank()) - ord(move.piece.get_rank())) <= 1:
             if not data_model.piece_at(move.get_rank(), move.get_file()):
                 return True
-        #TODO castling
-        #TODO cannot put self into check
-        pass
+        # TODO castling
+
+
 

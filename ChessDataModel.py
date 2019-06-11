@@ -1,4 +1,10 @@
 from Sprite import ChessPiece
+from AlgebraicNotationParser import is_valid_move
+from ChessMove import ChessMove
+import itertools
+
+LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+NUMBERS = range(1, 9)
 
 
 class ChessDataModel:
@@ -119,3 +125,37 @@ class ChessDataModel:
         else:
             return None
 
+    def capture(self, captured_piece):
+        for piece in self.pieces:
+            if piece == captured_piece:
+                self.pieces.remove(piece)
+                break
+
+    def king_in_check(self, rank, file, color):
+        for piece in self.get_pieces():
+            if piece.get_color() != color and piece.get_type() != "king":
+                if piece.get_type() != "pawn":
+                    move = ChessMove(piece, rank, file)
+                    if is_valid_move(move, self):
+                        return True
+                else:
+                    if color == "white":
+                        if piece.get_file() - file == 1 and abs(ord(piece.get_rank()) - ord(rank)) == 1:
+                            return True
+                    elif color == "black":
+                        if piece.get_file() - file == -1 and abs(ord(piece.get_rank()) - ord(rank)) == 1:
+                            return True
+        return False
+
+    def king_in_checkmate(self, rank, file, color):
+        if self.king_in_check(rank, file, color):
+            count = 0
+            for spot in list(itertools.product(LETTERS, NUMBERS)):
+                move = ChessMove(self.piece_at(rank, file), spot[0], spot[1])
+                if is_valid_move(move, self):
+                    count += 1
+            if count == 0:
+                return True
+        return False
+
+    # TODO King in stalemate

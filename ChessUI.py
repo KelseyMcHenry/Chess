@@ -7,7 +7,7 @@ from ChessMove import ChessMove
 import itertools
 
 LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-NUMBERS = range(1, 8)
+NUMBERS = range(1, 9)
 
 def refresh_screen():
     screen.fill((0, 0, 0))
@@ -47,11 +47,32 @@ while True:
                         if AlgebraicNotationParser.is_valid_move(move, datamodel):
                             chessboard.set_highlighted(spot[0], spot[1])
                     selected = datamodel.piece_at(rank, file)
-                if selected and not datamodel.piece_at(rank, file):
+                    print(f'selected {selected}')
+                elif selected and not datamodel.piece_at(rank, file):
                     move = ChessMove(selected, rank, file)
                     chessboard.clear_highlights()
                     if AlgebraicNotationParser.is_valid_move(move, datamodel):
                         target_piece = datamodel.get_piece(selected)
                         target_piece.set_position(rank, file)
-                        print(target_piece)
+                        if turn == 'white':
+                            turn = 'black'
+                        else:
+                            turn = 'white'
+                        print(f'moved {target_piece}')
+                elif selected and datamodel.piece_at(rank, file) and datamodel.piece_at(rank, file).get_color() != turn:
+                    captured = datamodel.piece_at(rank, file)
+                    move = ChessMove(selected, rank, file)
+                    chessboard.clear_highlights()
+                    if AlgebraicNotationParser.is_valid_move(move, datamodel):
+                        target_piece = datamodel.get_piece(selected)
+                        target_piece.set_position(rank, file)
+                        datamodel.capture(captured)
+                        if turn == 'white':
+                            turn = 'black'
+                        else:
+                            turn = 'white'
+                        print(f'moved {target_piece} capturing {captured}')
+                # TODO if King in check, only allow said king to be moved
+                # TODO if King in checkmate, game ends
+                # TODO if King in stalemate, game ends
                 refresh_screen()
